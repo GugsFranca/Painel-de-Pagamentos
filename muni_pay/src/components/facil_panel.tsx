@@ -61,7 +61,7 @@ export default function PainelMarqueFacil({ year }: { year: number }) {
                             </TableCell>
                         </TableRow>
                         <TableRow sx={{ backgroundColor: '#f5f5f5' }}>
-                            <TableCell>Pessoa</TableCell>
+                            <TableCell>Municípios</TableCell>
                             {Array.from({ length: 12 }, (_, i) => (
                                 <TableCell key={i} align="center">
                                     {new Date(0, i).toLocaleString('pt-BR', { month: 'short' }).toUpperCase()}
