@@ -1,7 +1,7 @@
 'use client';
 import React, { useMemo, useState, useEffect } from 'react';
 import { Box, Typography, CircularProgress, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Select, MenuItem, FormControl, InputLabel, Card, CardContent } from '@mui/material';
-import { TrendingUp, Assessment, LocationCity } from '@mui/icons-material';
+import { TrendingUp, Assessment, LocationCity, TrendingDown } from '@mui/icons-material';
 import { Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { ThemeProvider } from '@mui/material/styles';
 import useFetchMunicipios from '@/components/hooks/fetchChartHook';
@@ -100,6 +100,12 @@ export default function Dashboard() {
         </ThemeProvider>
     );
 
+    const somaDividas = (meses: Status[]) => {
+        const qtdDevedor = meses.filter(v => v === 2).length;
+        const qtdParcial = meses.filter(v => v === 4).length;
+        return qtdDevedor + qtdParcial;
+    }
+
     return (
         <ThemeProvider theme={theme}>
             <Box sx={{ p: 4, minHeight: '100vh', bgcolor: 'background.default' }}>
@@ -125,16 +131,19 @@ export default function Dashboard() {
 
                 {/* Stats Cards */}
                 <Box display="grid" gridTemplateColumns={{ xs: '1fr', md: '1fr 2fr' }} gap={3} mb={4}>
-                    <Card>
-                        <CardContent sx={{ textAlign: 'center' }}>
-                            <TrendingUp sx={{ fontSize: 48, mb: 2, color: 'secondary.main' }} />
-                            <Typography variant="h6">Status Global</Typography>
+                    <Card sx={{ textAlign: 'center', justifyContent: 'center', alignItems: 'center', display: 'flex' }}>
+                        <CardContent >
+                            <Typography variant="h6">Status Global
+                            </Typography>
                             <Typography variant="h2" color={globalStatus.percent >= 80 ? 'success.main' : 'error.main'}>
                                 {globalStatus.percent}%
                             </Typography>
                             <Typography variant="body2" color="text.secondary">
                                 {globalStatus.aptos} aptos de {globalStatus.total}
                             </Typography>
+                            {globalStatus.percent >= 80 && <TrendingUp sx={{ fontSize: 32, color: 'success.main' }} />}
+                            {globalStatus.percent < 80 && <TrendingDown sx={{ fontSize: 32, color: 'error.main' }} />}
+
                         </CardContent>
                     </Card>
 
@@ -181,7 +190,7 @@ export default function Dashboard() {
                     </Paper>
 
                     <Paper sx={{ p: 3 }}>
-                        <Typography variant="h6">Detalhamento por Sistema</Typography>
+                        <Typography variant="h6">Detalhamento por Quesito</Typography>
                         <TableContainer sx={{ maxHeight: 400 }}>
                             <Table size="small" stickyHeader>
                                 <TableHead>
@@ -196,10 +205,10 @@ export default function Dashboard() {
                                         <TableRow key={row.name}>
                                             <TableCell>{row.name}</TableCell>
                                             <TableCell align="center">
-                                                <StatusChip isPositive={statusMF(row.mesesMF)} label={statusMF(row.mesesMF) ? 'OK' : 'Pendente'} />
+                                                <StatusChip isPositive={statusMF(row.mesesMF)} label={statusMF(row.mesesMF) ? 'OK' : 'Pendente' + " - " + somaDividas(row.mesesMF)} />
                                             </TableCell>
                                             <TableCell align="center">
-                                                <StatusChip isPositive={statusRateio(row.mesesRateio)} label={statusRateio(row.mesesRateio) ? 'OK' : 'Pendente'} />
+                                                <StatusChip isPositive={statusRateio(row.mesesRateio)} label={statusRateio(row.mesesRateio) ? 'OK' : 'Pendente' + " - " + row.mesesRateio.filter(v => v === 2).length} />
                                             </TableCell>
                                         </TableRow>
                                     ))}

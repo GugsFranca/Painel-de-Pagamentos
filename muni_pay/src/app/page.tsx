@@ -101,8 +101,8 @@ export default function Home() {
             boxShadow: theme.shadows[1],
             p: 3,
             m: 2,
-            overflow: 'auto', // Adicione esta linha
-            maxWidth: '100%', // Garante que não ultrapasse o container
+            overflow: 'auto',
+            maxWidth: '100%',
           }}
         >
           <PainelMarqueFacil year={year} />
