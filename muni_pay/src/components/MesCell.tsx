@@ -1,12 +1,13 @@
-import { Button, TableCell } from "@mui/material";
+import { TableCell } from "@mui/material";
 
 export function MesCell({ status, onClick }: { status: Status; onClick: () => void }) {
 
     const bg =
-        status === 1 ? '#a5d6a7' :
-            status === 2 ? '#ef9a9a' :
-                status === 3 ? '#6c788e' :
-                    undefined;
+        status === 1 ? '#b9f6ca' :    // verde claro
+            status === 2 ? '#ff8a80' :    // vermelho claro
+                status === 3 ? '#b0bec5' :    // cinza claro
+                    status === 4 ? '#fff59d' :    // amarelo claro
+                        undefined;
 
 
     return (
@@ -20,7 +21,15 @@ export function MesCell({ status, onClick }: { status: Status; onClick: () => vo
                 }}
                 onClick={onClick}
             >
-                {status === 1 ? '✓' : status === 2 ? '✗' : status === 3 ? 'N' : ''}
+                {status === 1
+                    ? '✓'
+                    : status === 2
+                        ? '✗'
+                        : status === 3
+                            ? 'N'
+                            : status === 4
+                                ? '+/-'
+                                : ''}
             </button>
         </TableCell>
     );

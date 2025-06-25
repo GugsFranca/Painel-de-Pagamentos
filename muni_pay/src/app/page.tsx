@@ -76,7 +76,7 @@ export default function Home() {
         </Toolbar>
       </AppBar>
       <Box sx={{
-        p: 4,
+        p: 2,
         gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
         gap: 4,
         bgcolor: 'background.default',
@@ -94,16 +94,20 @@ export default function Home() {
           <PainelRateio year={year} />
         </Box>
 
-        <Box sx={{
-          bgcolor: 'background.paper',
-          borderRadius: 2,
-          boxShadow: theme.shadows[1],
-          p: 3,
-          m: 2
-        }}>
-
+        <Box
+          sx={{
+            bgcolor: 'background.paper',
+            borderRadius: 2,
+            boxShadow: theme.shadows[1],
+            p: 3,
+            m: 2,
+            overflow: 'auto', // Adicione esta linha
+            maxWidth: '100%', // Garante que não ultrapasse o container
+          }}
+        >
           <PainelMarqueFacil year={year} />
         </Box>
+
       </Box>
     </ThemeProvider >
   );

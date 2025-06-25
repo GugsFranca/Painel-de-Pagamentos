@@ -9,7 +9,6 @@ import useFetchAllMunicipios from '@/components/hooks/getAllChartsHook';
 import theme from "@/theme/dashTheme";
 import { StatusChip } from '@/components/ui/status';
 
-type Status = 0 | 1 | 2;
 interface Summary {
     name: string;
     mesesMF: Status[];
@@ -72,7 +71,7 @@ export default function Dashboard() {
 
 
 
-    const statusMF = (meses: Status[]) => !meses.some(s => s === 2);
+    const statusMF = (meses: Status[]) => !meses.some(s => s === 2 || s === 4);
     const statusRateio = (meses: Status[]) => {
         const qtdDevedor = meses.filter(v => v === 2).length;
         return qtdDevedor < 3;
@@ -134,7 +133,7 @@ export default function Dashboard() {
                                 {globalStatus.percent}%
                             </Typography>
                             <Typography variant="body2" color="text.secondary">
-                                {globalStatus.aptos} de {globalStatus.total} aptos
+                                {globalStatus.aptos} aptos de {globalStatus.total}
                             </Typography>
                         </CardContent>
                     </Card>

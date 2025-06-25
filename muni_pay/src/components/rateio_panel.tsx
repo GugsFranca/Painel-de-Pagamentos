@@ -6,7 +6,7 @@ import {
     Box,
     Input
 } from '@mui/material';
-import { MesCell } from "./MesCell";
+import { MesCell } from "./mesCell";
 import useFetchMunicipios from "./hooks/fetchChartHook";
 import { usePainelFunctions } from "./utils";
 import useDeleteMunicipios from "./hooks/deleteRowHook";
