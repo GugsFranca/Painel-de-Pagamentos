@@ -1,0 +1,14 @@
+.git
+.gitignore
+.dockerignore
+node_modules
+.next
+Dockerfile
+Dockerfile.prod
+Dockerfile.dev
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+README.md
