@@ -108,7 +108,7 @@ export default function PainelMarqueFacil({ year }: { year: number }) {
                                             ))
                                         }
                                         <TableCell align="center" className="gap-2 flex">
-                                            <div className="gap-2 flex">
+                                            <div className="gap-2 flex justify-center">
                                                 <Button size="small" variant="contained" onClick={() => marcarProximo(rowIdx, 1)} sx={{ bgcolor: 'green', '&:hover': { bgcolor: 'darkgreen' } }}>Pago</Button>
                                                 <Button size="small" variant="contained" onClick={() => marcarProximo(rowIdx, 4)} sx={{ color: "black", bgcolor: 'yellow', '&:hover': { bgcolor: 'goldenrod' } }}>Parcial</Button>
                                                 <Button size="small" variant="contained" onClick={() => marcarProximo(rowIdx, 2)} sx={{ bgcolor: 'red', '&:hover': { bgcolor: 'darkred' } }}>Devedor</Button>
@@ -129,18 +129,22 @@ export default function PainelMarqueFacil({ year }: { year: number }) {
                                 );
                             })}
                         <TableRow>
-                            <TableCell colSpan={2} align="center">
-                                <Input
-                                    inputRef={inputRef}
-                                    placeholder="Adicionar"
-                                    sx={{ fontSize: '0.75rem', py: 0.5 }}
-                                    onKeyDown={e => {
-                                        if (e.key === 'Enter') {
-                                            handleAddMunicipio(inputRef.current?.value || '');
-                                            inputRef.current!.value = '';
-                                        }
-                                    }}
-                                />
+                            <TableCell colSpan={16}>
+                                <Box sx={{ display: 'inline-block', minWidth: 120 }}>
+                                    <Input
+                                        inputRef={inputRef}
+                                        placeholder="Adicionar"
+                                        onKeyDown={e => {
+                                            if (e.key === 'Enter') {
+                                                handleAddMunicipio(inputRef.current?.value || '');
+                                                inputRef.current!.value = '';
+                                            }
+                                        }}
+                                        sx={{ py: 0.5, width: '100%' }}
+
+                                    />
+                                </Box>
+
                             </TableCell>
                         </TableRow>
                     </TableBody>

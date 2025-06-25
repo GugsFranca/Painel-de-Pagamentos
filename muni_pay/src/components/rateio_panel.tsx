@@ -62,15 +62,15 @@ export default function PainelRateio({ year }: { year: number }) {
                             </TableCell>
                         </TableRow>
                         <TableRow sx={{ backgroundColor: '#f5f5f5' }}>
-                            <TableCell>Municípios</TableCell>
+                            <TableCell sx={{ py: 0.5 }}>Municípios</TableCell>
                             {Array.from({ length: 12 }, (_, i) => (
                                 <TableCell key={i} align="center">
                                     {new Date(0, i).toLocaleString('pt-BR', { month: 'short' }).toUpperCase()}
                                 </TableCell>
                             ))}
-                            <TableCell align="center">Ações</TableCell>
-                            <TableCell align="center">Resumo</TableCell>
-                            <TableCell align="center">Status</TableCell>
+                            <TableCell align="center" sx={{ py: 0.5 }}>Ações</TableCell>
+                            <TableCell align="center" sx={{ py: 0.5 }}>Resumo</TableCell>
+                            <TableCell align="center" sx={{ py: 0.5 }}>Status</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -89,7 +89,7 @@ export default function PainelRateio({ year }: { year: number }) {
                                         <MesCell key={i} status={status as Status} onClick={() => mesesClick(rowIdx, i)} />
                                     ))}
                                     <TableCell align="center">
-                                        <div className="gap-2 flex">
+                                        <div className="gap-2 flex justify-center">
                                             <Button size="small" variant="contained" onClick={() => marcarProximo(rowIdx, 1)} sx={{ bgcolor: 'green', '&:hover': { bgcolor: 'darkgreen' } }}>Pago</Button>
                                             <Button size="small" variant="contained" onClick={() => marcarProximo(rowIdx, 2)} sx={{ bgcolor: 'red', '&:hover': { bgcolor: 'darkred' } }}>Devedor</Button>
                                             <Button size="small" variant="contained" onClick={() => marcarProximo(rowIdx, 3)} sx={{ bgcolor: 'gray', '&:hover': { bgcolor: 'darkgray' } }}>Não</Button>
@@ -109,18 +109,23 @@ export default function PainelRateio({ year }: { year: number }) {
                             );
                         })}
                         <TableRow>
-                            <TableCell colSpan={2} align="center">
-                                <Input
-                                    inputRef={inputRef}
-                                    placeholder="Adicionar"
-                                    onKeyDown={e => {
-                                        if (e.key === 'Enter') {
-                                            handleAddMunicipio(inputRef.current?.value || '');
-                                            inputRef.current!.value = '';
-                                        }
+                            <TableCell colSpan={16}>
+                                <Box sx={{ display: 'inline-block', minWidth: 120 }}>
+                                    <Input
+                                        inputRef={inputRef}
+                                        placeholder="Adicionar"
+                                        onKeyDown={e => {
+                                            if (e.key === 'Enter') {
+                                                handleAddMunicipio(inputRef.current?.value || '');
+                                                inputRef.current!.value = '';
+                                            }
 
-                                    }}
-                                />
+                                        }}
+                                        sx={{ py: 0.5, width: '100%' }}
+
+                                    />
+                                </Box>
+
                             </TableCell>
                         </TableRow>
                     </TableBody>
