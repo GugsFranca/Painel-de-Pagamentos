@@ -115,7 +115,7 @@ export default function Dashboard() {
 
     return (
         <ThemeProvider theme={theme}>
-            <Box sx={{ p: 4, minHeight: '100vh', bgcolor: 'background.paper', borderRadius: '10px', boxShadow: '0 4px 3px 2px #dbdbdb' }}>
+            <Box sx={{ p: 4, minHeight: '100vh', bgcolor: 'background.paper', borderRadius: '10px', boxShadow: '0 4px 4px  #dbdbdb' }}>
                 {/* Header */}
                 <Box mb={4}>
                     <Box display="flex" alignItems="center" gap={2} mb={2}>
