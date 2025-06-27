@@ -122,7 +122,7 @@ export default function PainelMarqueFacil({ year }: { year: number }) {
                                         </TableCell>
                                         <TableCell align="center">
                                             <Typography fontWeight="bold" fontSize="0.75rem" color={apto ? 'green' : 'red'}>
-                                                {apto ? 'Sim' : 'Não'}
+                                                {qtdPago === 0 && qtdDevedor === 0 ? "---" : (apto ? 'Sim' : 'Não')}
                                             </Typography>
                                         </TableCell>
                                     </TableRow>

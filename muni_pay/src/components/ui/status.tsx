@@ -2,6 +2,8 @@
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
 import { Chip, SxProps, Theme } from '@mui/material';
+import RemoveIcon from '@mui/icons-material/Remove';
+
 
 interface StatusIconProps {
   isPositive: boolean;
@@ -13,16 +15,37 @@ interface StatusChipProps {
   sx?: SxProps<Theme>;
 }
 
-export const StatusIcon = ({ isPositive, sx }: StatusIconProps) => (
-  isPositive ?
-    <CheckCircleIcon sx={{ color: 'success.main', fontSize: 20, ...sx }} /> :
-    <CancelIcon sx={{ color: 'error.main', fontSize: 20, ...sx }} />
-);
-export const StatusChip = ({ isPositive, label, sx }: StatusChipProps) => (
+
+
+type StatusType = 'positive' | 'negative' | 'neutral';
+
+interface StatusIconProps {
+  statusType: StatusType;
+  sx?: SxProps<Theme>;
+}
+interface StatusChipProps {
+  statusType: StatusType;
+  label: string;
+  sx?: SxProps<Theme>;
+}
+
+export const StatusIcon = ({ statusType, sx }: StatusIconProps) => {
+  switch (statusType) {
+    case 'positive':
+      return <CheckCircleIcon sx={{ color: 'success.main', fontSize: 20, ...sx }} />;
+    case 'negative':
+      return <CancelIcon sx={{ color: 'error.main', fontSize: 20, ...sx }} />;
+    case 'neutral':
+      return <RemoveIcon sx={{ color: 'text.secondary', fontSize: 20, ...sx }} />;
+    default:
+      return null;
+  }
+};
+export const StatusChip = ({ statusType, label, sx }: StatusChipProps) => (
   <Chip
-    icon={<StatusIcon isPositive={isPositive} />}
+    icon={<StatusIcon statusType={statusType} isPositive={false} />}
     label={label}
-    color={isPositive ? 'success' : 'error'}
+    color={statusType === 'positive' ? 'success' : statusType === 'negative' ? 'error' : 'default'}
     variant="outlined"
     size="small"
     sx={{

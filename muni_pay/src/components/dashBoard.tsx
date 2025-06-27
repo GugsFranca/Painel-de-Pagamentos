@@ -71,10 +71,17 @@ export default function Dashboard() {
 
 
 
-    const statusMF = (meses: Status[]) => !meses.some(s => s === 2 || s === 4);
+    const statusMF = (meses: Status[]) => {
+        const pentendes = !meses.some(s => s === 2 || s === 4)
+        const nao = meses.every(s => s === 0)
+
+        return pentendes && !nao ? true : false;
+    };
     const statusRateio = (meses: Status[]) => {
         const qtdDevedor = meses.filter(v => v === 2).length;
-        return qtdDevedor < 3;
+        const nao = meses.every(v => v === 0)
+
+        return qtdDevedor < 3 && !nao ? true : false;
     };
     const aptoGlobal = (row: Summary) => statusMF(row.mesesMF) && statusRateio(row.mesesRateio);
 
@@ -108,7 +115,7 @@ export default function Dashboard() {
 
     return (
         <ThemeProvider theme={theme}>
-            <Box sx={{ p: 4, minHeight: '100vh', bgcolor: 'background.default' }}>
+            <Box sx={{ p: 4, minHeight: '100vh', bgcolor: 'background.paper', borderRadius: '10px', boxShadow: '0 4px 3px 2px #dbdbdb' }}>
                 {/* Header */}
                 <Box mb={4}>
                     <Box display="flex" alignItems="center" gap={2} mb={2}>
@@ -135,14 +142,14 @@ export default function Dashboard() {
                         <CardContent >
                             <Typography variant="h6">Status Global
                             </Typography>
-                            <Typography variant="h2" color={globalStatus.percent >= 80 ? 'success.main' : 'error.main'}>
+                            <Typography variant="h2" color={globalStatus.percent >= 60 ? 'success.main' : 'error.main'}>
                                 {globalStatus.percent}%
                             </Typography>
                             <Typography variant="body2" color="text.secondary">
                                 {globalStatus.aptos} aptos de {globalStatus.total}
                             </Typography>
-                            {globalStatus.percent >= 80 && <TrendingUp sx={{ fontSize: 32, color: 'success.main' }} />}
-                            {globalStatus.percent < 80 && <TrendingDown sx={{ fontSize: 32, color: 'error.main' }} />}
+                            {globalStatus.percent >= 60 && <TrendingUp sx={{ fontSize: 32, color: 'success.main' }} />}
+                            {globalStatus.percent < 60 && <TrendingDown sx={{ fontSize: 32, color: 'error.main' }} />}
 
                         </CardContent>
                     </Card>
@@ -180,7 +187,12 @@ export default function Dashboard() {
                                         <TableRow key={row.name}>
                                             <TableCell>{row.name}</TableCell>
                                             <TableCell align="center">
-                                                <StatusChip isPositive={aptoGlobal(row)} label={aptoGlobal(row) ? 'Apto' : 'Não Apto'} />
+                                                {row.mesesMF.every(v => v === 0) ? (
+                                                    <StatusChip statusType="neutral" label='Não se aplica' isPositive={false} sx={{ color: 'text.secondary' }} />
+                                                ) : (
+                                                    <StatusChip statusType={aptoGlobal(row) ? 'positive' : 'negative'} label={aptoGlobal(row) ? 'Apto' : 'Não Apto'} isPositive={false} />
+
+                                                )}
                                             </TableCell>
                                         </TableRow>
                                     ))}
@@ -205,10 +217,19 @@ export default function Dashboard() {
                                         <TableRow key={row.name}>
                                             <TableCell>{row.name}</TableCell>
                                             <TableCell align="center">
-                                                <StatusChip isPositive={statusMF(row.mesesMF)} label={statusMF(row.mesesMF) ? 'OK' : 'Pendente' + " - " + somaDividas(row.mesesMF)} />
+                                                {row.mesesMF.every(v => v === 0) ? (
+                                                    <StatusChip statusType="neutral" label='Não se aplica' isPositive={false} sx={{ color: 'text.secondary' }} />
+                                                ) : (
+                                                    <StatusChip
+                                                        statusType={statusMF(row.mesesMF) ? 'positive' : 'negative'}
+                                                        label={statusMF(row.mesesMF) ? 'OK' : 'Pendente - ' + somaDividas(row.mesesMF)} isPositive={false} />
+                                                )}
                                             </TableCell>
                                             <TableCell align="center">
-                                                <StatusChip isPositive={statusRateio(row.mesesRateio)} label={statusRateio(row.mesesRateio) ? 'OK' : 'Pendente' + " - " + row.mesesRateio.filter(v => v === 2).length} />
+                                                {row.mesesRateio.every(v => v === 0) ? (
+                                                    <StatusChip statusType="neutral" label='Não se aplica' isPositive={false} sx={{ color: 'text.secondary' }} />
+                                                ) : (
+                                                    <StatusChip statusType={statusRateio(row.mesesRateio) ? 'positive' : 'negative'} label={statusRateio(row.mesesRateio) ? 'OK' : 'Pendente' + " - " + row.mesesRateio.filter(v => v === 2).length} isPositive={false} />)}
                                             </TableCell>
                                         </TableRow>
                                     ))}
@@ -218,6 +239,6 @@ export default function Dashboard() {
                     </Paper>
                 </Box>
             </Box>
-        </ThemeProvider>
+        </ThemeProvider >
     );
 }

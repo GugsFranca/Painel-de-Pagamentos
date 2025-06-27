@@ -101,7 +101,7 @@ export default function PainelRateio({ year }: { year: number }) {
                                     </TableCell>
                                     <TableCell align="center">
                                         <Typography fontWeight="bold" color={apto ? 'green' : 'red'}>
-                                            {apto ? 'Sim' : 'Não'}
+                                            {qtdPago === 0 && qtdDevedor === 0 ? "---" : (apto ? 'Sim' : 'Não')}
                                         </Typography>
                                     </TableCell>
 
