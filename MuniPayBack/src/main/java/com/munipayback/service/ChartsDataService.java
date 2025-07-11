@@ -65,7 +65,29 @@ public class ChartsDataService {
         BeanUtils.copyProperties(chartsData, existingChartsData, "id", "data");
 
         existingChartsData.getData().clear();
-        existingChartsData.getData().addAll(chartsData.getData());
+        for (RowData newRow : chartsData.getData()) {
+            RowData existingRow = existingChartsData.getData().stream()
+                    .filter(r -> r.getName().equals(newRow.getName()))
+                    .findFirst()
+                    .orElseGet(() -> RowData.builder()
+                            .name(newRow.getName())
+                            .meses(new ArrayList<>())
+                            .valores(new ArrayList<>())
+                            .build());
+
+            existingRow.setMeses(newRow.getMeses());
+
+            if (newRow.getValores() != null) {
+                List<Double> valores = new ArrayList<>(newRow.getValores());
+                while (valores.size() < 12) {
+                    valores.add(0.0);
+                }
+                existingRow.setValores(valores);
+            }
+
+            existingChartsData.getData().add(existingRow);
+        }
+
         return chartsDataRepository.save(existingChartsData);
     }
 
@@ -75,14 +97,14 @@ public class ChartsDataService {
 
     private List<RowData> setChartsData() {
         List<RowData> rowDataList = new ArrayList<>();
-        rowDataList.add(RowData.builder().name("Mesquita").meses(List.of(0)).build());
-        rowDataList.add(RowData.builder().name("Nilópolis").meses(List.of(0)).build());
-        rowDataList.add(RowData.builder().name("Nova Iguaçu").meses(List.of(0)).build());
-        rowDataList.add(RowData.builder().name("Queimados").meses(List.of(0)).build());
-        rowDataList.add(RowData.builder().name("Japeri").meses(List.of(0)).build());
-        rowDataList.add(RowData.builder().name("Belford Roxo").meses(List.of(0)).build());
-        rowDataList.add(RowData.builder().name("Itaguaí").meses(List.of(0)).build());
-        rowDataList.add(RowData.builder().name("Paracambi").meses(List.of(0)).build());
+        rowDataList.add(RowData.builder().name("Mesquita").meses(List.of(0)).valores(List.of(0.0)).build());
+        rowDataList.add(RowData.builder().name("Nilópolis").meses(List.of(0)).valores(List.of(0.0)).build());
+        rowDataList.add(RowData.builder().name("Nova Iguaçu").meses(List.of(0)).valores(List.of(0.0)).build());
+        rowDataList.add(RowData.builder().name("Queimados").meses(List.of(0)).valores(List.of(0.0)).build());
+        rowDataList.add(RowData.builder().name("Japeri").meses(List.of(0)).valores(List.of(0.0)).build());
+        rowDataList.add(RowData.builder().name("Belford Roxo").meses(List.of(0)).valores(List.of(0.0)).build());
+        rowDataList.add(RowData.builder().name("Itaguaí").meses(List.of(0)).valores(List.of(0.0)).build());
+        rowDataList.add(RowData.builder().name("Paracambi").meses(List.of(0)).valores(List.of(0.0)).build());
         return rowDataList;
     }
 }
