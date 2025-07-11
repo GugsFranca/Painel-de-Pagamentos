@@ -1,8 +1,12 @@
 'use client';
 import React, { useMemo, useState, useEffect } from 'react';
-import { Box, Typography, CircularProgress, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Select, MenuItem, FormControl, InputLabel, Card, CardContent } from '@mui/material';
+import {
+    Box, Typography, CircularProgress, Paper, Table, TableBody, TableCell,
+    TableContainer, TableHead, TableRow, Select, MenuItem, FormControl,
+    InputLabel, Card, CardContent
+} from '@mui/material';
 import { TrendingUp, Assessment, LocationCity, TrendingDown } from '@mui/icons-material';
-import { Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis } from 'recharts';
 import { ThemeProvider } from '@mui/material/styles';
 import useFetchMunicipios from '@/components/hooks/fetchChartHook';
 import useFetchAllMunicipios from '@/components/hooks/getAllChartsHook';
@@ -13,6 +17,7 @@ interface Summary {
     name: string;
     mesesMF: Status[];
     mesesRateio: Status[];
+    totalDividaMF: number;
 }
 
 export default function Dashboard() {
@@ -28,11 +33,12 @@ export default function Dashboard() {
     useEffect(() => {
         localStorage.setItem('selectedYearDash', year.toString());
     }, [year]);
+
     useEffect(() => {
         if (!allTables?.length) return;
         const uniqueYears = [...new Set(allTables.map(table =>
-            parseInt(table.name.split('_')[1]))
-        )].filter(y => !isNaN(y));
+            parseInt(table.name.split('_')[1])
+        ))].filter(y => !isNaN(y));
         setYears(uniqueYears.sort((a, b) => b - a));
         if (!uniqueYears.includes(year)) setYear(uniqueYears[0]);
     }, [allTables]);
@@ -43,7 +49,7 @@ export default function Dashboard() {
     const { municipios: mB } = useFetchMunicipios(tableB);
     const loading = !mA || !mB || allLoading;
 
-    const summary = useMemo(() => {
+    const summary: Summary[] = useMemo(() => {
         if (!mA || !mB) return [];
         const getData = (data: any[], table: string) =>
             data.find(t => t.name === table)?.data || [];
@@ -51,38 +57,40 @@ export default function Dashboard() {
         const tA = getData(mA, tableA);
         const tB = getData(mB, tableB);
 
-        const process = (data: any[], isRateio = false) => {
-            const map = new Map<string, { meses: Status[] }>();
-            data.forEach(row => {
-                const meses = row.meses as Status[];
-                map.set(row.name, { meses: isRateio ? meses.filter(v => v !== 0) : meses });
+        const mapMF = new Map<string, { meses: Status[], valores: number[] }>();
+        tA.forEach((row: any) => {
+            mapMF.set(row.name, {
+                meses: row.meses as Status[],
+                valores: row.valores ?? Array(12).fill(0),
             });
-            return map;
-        };
-        const mapA = process(tA);
-        const mapB = process(tB, true);
+        });
 
-        return Array.from(new Set([...mapA.keys(), ...mapB.keys()])).map(name => ({
-            name,
-            mesesMF: mapA.get(name)?.meses || [],
-            mesesRateio: mapB.get(name)?.meses || []
-        }));
+        const mapB = new Map<string, Status[]>();
+        tB.forEach((row: any) => {
+            mapB.set(row.name, (row.meses as Status[]).filter(v => v !== 0));
+        });
+
+        return Array.from(new Set([...mapMF.keys(), ...mapB.keys()])).map(name => {
+            const { meses: mesesMF, valores } = mapMF.get(name) || { meses: [], valores: [] };
+            const mesesRateio = mapB.get(name) || [];
+            const totalDividaMF = valores.reduce((acc, v, idx) =>
+                (mesesMF[idx] === 2 || mesesMF[idx] === 4) ? acc + v : acc, 0);
+            return { name, mesesMF, mesesRateio, totalDividaMF };
+        });
     }, [mA, mB]);
 
-
-
     const statusMF = (meses: Status[]) => {
-        const pentendes = !meses.some(s => s === 2 || s === 4)
-        const nao = meses.every(s => s === 0)
-
-        return pentendes && !nao ? true : false;
+        const pendentes = !meses.some(s => s === 2 || s === 4);
+        const nao = meses.every(s => s === 0);
+        return pendentes && !nao ? true : false;
     };
+
     const statusRateio = (meses: Status[]) => {
         const qtdDevedor = meses.filter(v => v === 2).length;
-        const nao = meses.every(v => v === 0)
-
+        const nao = meses.every(v => v === 0);
         return qtdDevedor < 3 && !nao ? true : false;
     };
+
     const aptoGlobal = (row: Summary) => statusMF(row.mesesMF) && statusRateio(row.mesesRateio);
 
     const globalStatus = useMemo(() => {
@@ -96,6 +104,12 @@ export default function Dashboard() {
         { name: 'Não Aptos', value: globalStatus.total - globalStatus.aptos, color: theme.palette.error.main }
     ];
 
+    const somaDividas = (meses: Status[]) => {
+        const qtdDevedor = meses.filter(v => v === 2).length;
+        const qtdParcial = meses.filter(v => v === 4).length;
+        return qtdDevedor + qtdParcial;
+    };
+
     if (loading) return (
         <ThemeProvider theme={theme}>
             <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
@@ -106,12 +120,6 @@ export default function Dashboard() {
             </Box>
         </ThemeProvider>
     );
-
-    const somaDividas = (meses: Status[]) => {
-        const qtdDevedor = meses.filter(v => v === 2).length;
-        const qtdParcial = meses.filter(v => v === 4).length;
-        return qtdDevedor + qtdParcial;
-    }
 
     return (
         <ThemeProvider theme={theme}>
@@ -136,41 +144,64 @@ export default function Dashboard() {
                     </FormControl>
                 </Box>
 
-                {/* Stats Cards */}
+                {/* Cards */}
                 <Box display="grid" gridTemplateColumns={{ xs: '1fr', md: '1fr 2fr' }} gap={3} mb={4}>
                     <Card sx={{ textAlign: 'center', justifyContent: 'center', alignItems: 'center', display: 'flex' }}>
                         <CardContent >
-                            <Typography variant="h6">Status Global
-                            </Typography>
+                            <Typography variant="h6">Status Global</Typography>
                             <Typography variant="h2" color={globalStatus.percent >= 60 ? 'success.main' : 'error.main'}>
                                 {globalStatus.percent}%
                             </Typography>
                             <Typography variant="body2" color="text.secondary">
                                 {globalStatus.aptos} aptos de {globalStatus.total}
                             </Typography>
-                            {globalStatus.percent >= 60 && <TrendingUp sx={{ fontSize: 32, color: 'success.main' }} />}
-                            {globalStatus.percent < 60 && <TrendingDown sx={{ fontSize: 32, color: 'error.main' }} />}
-
+                            {globalStatus.percent >= 60
+                                ? <TrendingUp sx={{ fontSize: 32, color: 'success.main' }} />
+                                : <TrendingDown sx={{ fontSize: 32, color: 'error.main' }} />}
                         </CardContent>
                     </Card>
 
                     <Paper sx={{ p: 3 }}>
                         <Typography variant="h6" display="flex" alignItems="center" gap={1} mb={2}>
-                            <LocationCity /> Distribuição de Aptidão
+                            <LocationCity /> Distribuição e Dívidas
                         </Typography>
-                        <ResponsiveContainer width="100%" height={250}>
-                            <PieChart>
-                                <Pie data={pieData} dataKey="value" cx="50%" cy="50%" innerRadius={60} outerRadius={100}>
-                                    {pieData.map((entry, i) => <Cell key={i} fill={entry.color} />)}
-                                </Pie>
-                                <Tooltip />
-                                <Legend />
-                            </PieChart>
-                        </ResponsiveContainer>
+
+                        <Box display="grid" gridTemplateColumns={{ xs: '1fr', md: '1fr 1fr' }} gap={2}>
+                            {/* Gráfico de Pizza */}
+                            <ResponsiveContainer width="100%" height={250}>
+                                <PieChart>
+                                    <Pie data={pieData} dataKey="value" cx="50%" cy="50%" innerRadius={50} outerRadius={80}>
+                                        {pieData.map((entry, i) => <Cell key={i} fill={entry.color} />)}
+                                    </Pie>
+                                    <Tooltip />
+                                    <Legend />
+                                </PieChart>
+                            </ResponsiveContainer>
+
+                            {/* Gráfico de Barras de Dívidas */}
+                            <ResponsiveContainer width="100%" height={250}>
+                                <BarChart
+                                    data={summary
+                                        .filter(s => s.totalDividaMF > 0)
+                                        .sort((a, b) => b.totalDividaMF - a.totalDividaMF)
+                                        .slice(0, 10) // Top 10
+                                        .map(s => ({
+                                            name: s.name.length > 12 ? s.name.slice(0, 12) + '...' : s.name,
+                                            divida: s.totalDividaMF
+                                        }))}
+                                >
+                                    <XAxis dataKey="name" tick={{ fontSize: 10 }} />
+                                    <YAxis tickFormatter={v => v >= 1000 ? (v / 1000) + 'k' : v} />
+                                    <Tooltip formatter={(v) => (v as number).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })} />
+                                    <Bar dataKey="divida" fill={theme.palette.error.main} radius={[4, 4, 0, 0]} />
+                                </BarChart>
+                            </ResponsiveContainer>
+                        </Box>
                     </Paper>
                 </Box>
 
-                {/* Tables */}
+
+                {/* Tabelas */}
                 <Box display="grid" gridTemplateColumns={{ xs: '1fr', lg: '1fr 1fr' }} gap={3} mb={4}>
                     <Paper sx={{ p: 3 }}>
                         <Typography variant="h6">Aptidão para Crédito</Typography>
@@ -179,6 +210,7 @@ export default function Dashboard() {
                                 <TableHead>
                                     <TableRow>
                                         <TableCell>Município</TableCell>
+                                        <TableCell align="center">Total Dívida MF</TableCell>
                                         <TableCell align="center">Status</TableCell>
                                     </TableRow>
                                 </TableHead>
@@ -187,11 +219,17 @@ export default function Dashboard() {
                                         <TableRow key={row.name}>
                                             <TableCell>{row.name}</TableCell>
                                             <TableCell align="center">
+                                                {row.totalDividaMF.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                                            </TableCell>
+                                            <TableCell align="center">
                                                 {row.mesesMF.every(v => v === 0) ? (
                                                     <StatusChip statusType="neutral" label='Não se aplica' isPositive={false} sx={{ color: 'text.secondary' }} />
                                                 ) : (
-                                                    <StatusChip statusType={aptoGlobal(row) ? 'positive' : 'negative'} label={aptoGlobal(row) ? 'Apto' : 'Não Apto'} isPositive={false} />
-
+                                                    <StatusChip
+                                                        statusType={aptoGlobal(row) ? 'positive' : 'negative'}
+                                                        label={aptoGlobal(row) ? 'Apto' : 'Não Apto'}
+                                                        isPositive={false}
+                                                    />
                                                 )}
                                             </TableCell>
                                         </TableRow>
@@ -216,20 +254,28 @@ export default function Dashboard() {
                                     {summary.map(row => (
                                         <TableRow key={row.name}>
                                             <TableCell>{row.name}</TableCell>
+
                                             <TableCell align="center">
                                                 {row.mesesMF.every(v => v === 0) ? (
                                                     <StatusChip statusType="neutral" label='Não se aplica' isPositive={false} sx={{ color: 'text.secondary' }} />
                                                 ) : (
                                                     <StatusChip
                                                         statusType={statusMF(row.mesesMF) ? 'positive' : 'negative'}
-                                                        label={statusMF(row.mesesMF) ? 'OK' : 'Pendente - ' + somaDividas(row.mesesMF)} isPositive={false} />
+                                                        label={statusMF(row.mesesMF) ? 'OK' : 'Pendente - ' + somaDividas(row.mesesMF)}
+                                                        isPositive={false}
+                                                    />
                                                 )}
                                             </TableCell>
                                             <TableCell align="center">
                                                 {row.mesesRateio.every(v => v === 0) ? (
                                                     <StatusChip statusType="neutral" label='Não se aplica' isPositive={false} sx={{ color: 'text.secondary' }} />
                                                 ) : (
-                                                    <StatusChip statusType={statusRateio(row.mesesRateio) ? 'positive' : 'negative'} label={statusRateio(row.mesesRateio) ? 'OK' : 'Pendente' + " - " + row.mesesRateio.filter(v => v === 2).length} isPositive={false} />)}
+                                                    <StatusChip
+                                                        statusType={statusRateio(row.mesesRateio) ? 'positive' : 'negative'}
+                                                        label={statusRateio(row.mesesRateio) ? 'OK' : 'Pendente - ' + row.mesesRateio.filter(v => v === 2).length}
+                                                        isPositive={false}
+                                                    />
+                                                )}
                                             </TableCell>
                                         </TableRow>
                                     ))}
@@ -239,6 +285,6 @@ export default function Dashboard() {
                     </Paper>
                 </Box>
             </Box>
-        </ThemeProvider >
+        </ThemeProvider>
     );
 }

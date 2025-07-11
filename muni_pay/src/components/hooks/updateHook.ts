@@ -1,17 +1,16 @@
+// hooks/updateHook.ts
 import { useState } from 'react';
 
 export default function useUpdateMunicipios() {
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<Error | null>(null);
-    const [success, setSuccess] = useState<boolean>(false);
 
     const url = process.env.NEXT_PUBLIC_API_URL;
 
-    const updateData = async (dataToUpdate: TableData[]) => {
+    const update = async (dataToUpdate: TableData[]) => {
         try {
             setLoading(true);
             setError(null);
-            setSuccess(false);
 
             const response = await fetch(`${url}/charts`, {
                 method: 'PUT',
@@ -25,9 +24,8 @@ export default function useUpdateMunicipios() {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
 
-            setSuccess(true);
-            const result = await response.json();
-            return result;
+            // Garante que retorna os dados atualizados
+            return await response.json();
         } catch (err) {
             setError(err instanceof Error ? err : new Error('Unknown error'));
             console.error('Error updating data:', err);
@@ -38,9 +36,8 @@ export default function useUpdateMunicipios() {
     };
 
     return {
-        update: updateData,
+        update,
         loading,
         error,
-        success,
     };
 }

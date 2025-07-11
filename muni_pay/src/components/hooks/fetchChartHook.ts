@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-
+// hooks/fetchChartHook.ts
+import { useState, useEffect, useCallback } from 'react';
 
 const fillMeses = (meses: Status[]): Status[] => {
     const normalized = [...meses];
@@ -16,9 +16,10 @@ export default function useFetchMunicipios(endpoint: string) {
 
     const url = process.env.NEXT_PUBLIC_API_URL;
 
-    const fetchData = async () => {
+    const fetchData = useCallback(async () => {
         try {
             setLoading(true);
+            setError(null);
             const response = await fetch(`${url}/charts/${endpoint}`);
 
             if (!response.ok) {
@@ -31,22 +32,21 @@ export default function useFetchMunicipios(endpoint: string) {
                 meses: fillMeses(row.meses)
             }));
             setData([chartData]);
-            setError(null);
         } catch (err) {
-            setError(err instanceof Error ? err : new Error('Unknown error'));
             console.error('Error fetching data:', err);
+            setError(err instanceof Error ? err : new Error('Unknown error'));
         } finally {
             setLoading(false);
         }
-    };
+    }, [url, endpoint]);
 
     useEffect(() => {
         fetchData();
-    }, [endpoint]);
+    }, [fetchData]);
 
     return {
         municipios: data,
-        loading,
+        isLoading: loading,
         error,
         refetch: fetchData,
         setMunicipios: setData
