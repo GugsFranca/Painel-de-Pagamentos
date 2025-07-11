@@ -249,7 +249,7 @@ export default function PainelMarqueFacil({ year }: { year: number }) {
                                         <TableCell align="center" className="gap-2 flex">
                                             <Box className="gap-2 flex justify-center">
                                                 <Button size="small" variant="contained" onClick={() => marcarProximo(idx, 1)} sx={{ bgcolor: 'green', '&:hover': { bgcolor: 'darkgreen' } }}>Pago</Button>
-                                                <Button size="small" variant="contained" onClick={() => marcarProximo(idx, 4)} sx={{ color: 'black', bgcolor: 'yellow', '&:hover': { bgcolor: 'goldenrod' } }}>Parcial</Button>
+                                                <Button size="small" variant="contained" onClick={() => marcarProximo(idx, 4)} sx={{ bgcolor: '#fcca00', '&:hover': { bgcolor: 'goldenrod' } }}>Parcial</Button>
                                                 <Button size="small" variant="contained" onClick={() => marcarProximo(idx, 2)} sx={{ bgcolor: 'red', '&:hover': { bgcolor: 'darkred' } }}>Devedor</Button>
                                                 <Button size="small" variant="contained" onClick={() => marcarProximo(idx, 3)} sx={{ bgcolor: 'gray', '&:hover': { bgcolor: 'darkgray' } }}>Não</Button>
                                                 <Button size="small" variant="contained" onClick={() => limparLinha(idx)}>Limpar</Button>
