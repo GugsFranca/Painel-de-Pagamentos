@@ -6,7 +6,7 @@ import {
     InputLabel, Card, CardContent
 } from '@mui/material';
 import { TrendingUp, Assessment, LocationCity, TrendingDown } from '@mui/icons-material';
-import { Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis } from 'recharts';
+import { Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, LabelList } from 'recharts';
 import { ThemeProvider } from '@mui/material/styles';
 import useFetchMunicipios from '@/components/hooks/fetchChartHook';
 import useFetchAllMunicipios from '@/components/hooks/getAllChartsHook';
@@ -99,16 +99,13 @@ export default function Dashboard() {
         return { total, aptos, percent: total ? Math.round((aptos / total) * 100) : 0 };
     }, [summary]);
 
-    const pieData = [
-        { name: 'Aptos', value: globalStatus.aptos, color: theme.palette.success.main },
-        { name: 'Não Aptos', value: globalStatus.total - globalStatus.aptos, color: theme.palette.error.main }
-    ];
-
     const somaDividas = (meses: Status[]) => {
         const qtdDevedor = meses.filter(v => v === 2).length;
         const qtdParcial = meses.filter(v => v === 4).length;
         return qtdDevedor + qtdParcial;
     };
+
+    const totalDividas = summary.reduce((acc, row) => acc + row.totalDividaMF, 0);
 
     if (loading) return (
         <ThemeProvider theme={theme}>
@@ -168,15 +165,14 @@ export default function Dashboard() {
 
                         <Box display="grid" gridTemplateColumns={{ xs: '1fr', md: '1fr 1fr' }} gap={2}>
                             {/* Gráfico de Pizza */}
-                            <ResponsiveContainer width="100%" height={250}>
-                                <PieChart>
-                                    <Pie data={pieData} dataKey="value" cx="50%" cy="50%" innerRadius={50} outerRadius={80}>
-                                        {pieData.map((entry, i) => <Cell key={i} fill={entry.color} />)}
-                                    </Pie>
-                                    <Tooltip />
-                                    <Legend />
-                                </PieChart>
-                            </ResponsiveContainer>
+                            <Box sx={{ textAlign: 'center', justifyContent: 'center', alignItems: 'center', display: 'flex' }}>
+                                <CardContent >
+                                    <Typography variant="h6">Total de dividas</Typography>
+                                    <Typography variant="h2" color={totalDividas > 0 ? 'error.main' : 'success.main'}>
+                                        {totalDividas.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                                    </Typography>
+                                </CardContent>
+                            </Box>
 
                             {/* Gráfico de Barras de Dívidas */}
                             <ResponsiveContainer width="100%" height={250}>
@@ -189,11 +185,21 @@ export default function Dashboard() {
                                             name: s.name.length > 12 ? s.name.slice(0, 12) + '...' : s.name,
                                             divida: s.totalDividaMF
                                         }))}
+                                    margin={{ top: 30, right: 20, left: 0, bottom: 20 }} // aumenta o topo
                                 >
                                     <XAxis dataKey="name" tick={{ fontSize: 10 }} />
                                     <YAxis tickFormatter={v => v >= 1000 ? (v / 1000) + 'k' : v} />
                                     <Tooltip formatter={(v) => (v as number).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })} />
-                                    <Bar dataKey="divida" fill={theme.palette.error.main} radius={[4, 4, 0, 0]} />
+                                    <Bar
+                                        dataKey="divida"
+                                        fill={theme.palette.error.main}
+                                        radius={[4, 4, 0, 0]}
+                                        label={{
+                                            position: "top",
+                                            formatter: (value: number) =>
+                                                value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+                                        }}
+                                    />
                                 </BarChart>
                             </ResponsiveContainer>
                         </Box>

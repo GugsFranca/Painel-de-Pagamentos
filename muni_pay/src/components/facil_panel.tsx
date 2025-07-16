@@ -78,7 +78,6 @@ export default function PainelMarqueFacil({ year }: { year: number }) {
         );
     }
 
-    // Usamos apenas a primeira tabela retornada
     const tabela = municipios[0];
     if (!tabela.data) {
         return (
@@ -87,7 +86,6 @@ export default function PainelMarqueFacil({ year }: { year: number }) {
             </Box>
         );
     }
-    // Definimos rows como array seguro
     const rows: RowData[] = Array.isArray(tabela.data) ? tabela.data : [];
 
     // Handlers de modal
@@ -148,15 +146,11 @@ export default function PainelMarqueFacil({ year }: { year: number }) {
         const updateMeses = (row: RowData, idx: number) =>
             idx !== modalRow
                 ? row
-                : { ...row, meses: row.meses.map((st, i) => (i === modalMonth ? 1 : st)) };
-
-        setMunicipios(prev =>
-            prev.map(tbl =>
-                tbl.id !== tabela.id
-                    ? tbl
-                    : { ...tbl, data: rows.map(updateMeses) }
-            )
-        );
+                : {
+                    ...row,
+                    meses: row.meses.map((st, i) => (i === modalMonth ? 1 : st)),
+                    valores: row.valores?.map((v, i) => (i === modalMonth ? 0 : v)),
+                };
 
         try {
             const updatedTable = { ...tabela, data: rows.map(updateMeses) };
@@ -164,6 +158,7 @@ export default function PainelMarqueFacil({ year }: { year: number }) {
             setMunicipios(prev =>
                 prev.map(tbl => (tbl.id === tabela.id ? resp : tbl))
             );
+            closeModal();
         } catch {
             await refetch();
         }
@@ -197,7 +192,7 @@ export default function PainelMarqueFacil({ year }: { year: number }) {
                             .toUpperCase()}`}
                     tipo={tipoModal}
                     currentValue={currentValue}
-                    onMarkPaid={handleMarkPaid}           // nova prop
+                    onMarkPaid={handleMarkPaid}
 
                 />
             )}
@@ -285,4 +280,3 @@ export default function PainelMarqueFacil({ year }: { year: number }) {
         </Box>
     );
 }
-

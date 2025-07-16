@@ -111,11 +111,9 @@ export const usePainelFunctions = (
 
                     meses[mesIdx] = newStatus;
 
-                    // Inicializar valor se for dívida
                     if (newStatus === 2 || newStatus === 4) {
                         valores[mesIdx] = valores[mesIdx] || 0;
                     } else {
-                        // Resetar valor se não for dívida
                         valores[mesIdx] = 0;
                     }
 

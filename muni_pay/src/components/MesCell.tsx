@@ -66,7 +66,7 @@ export function MesCell({ status, valor, onClick }: MesCellProps) {
                             position: 'absolute',
                             bottom: 2,
                             right: 2,
-                            fontSize: '0.6rem', // Reduzido para caber melhor
+                            fontSize: '0.6rem',
                             fontWeight: 'bold',
                             color: status === 2 ? 'white' : 'black'
                         }}>
