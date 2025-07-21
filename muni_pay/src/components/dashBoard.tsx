@@ -142,10 +142,10 @@ export default function Dashboard() {
                 </Box>
 
                 {/* Cards */}
-                <Box display="grid" gridTemplateColumns={{ xs: '1fr', md: '1fr 2fr' }} gap={3} mb={4}>
-                    <Card sx={{ textAlign: 'center', justifyContent: 'center', alignItems: 'center', display: 'flex' }}>
-                        <CardContent >
-                            <Typography variant="h6">Status Global</Typography>
+                <Box display="grid" gridTemplateColumns={{ xs: '1fr', md: '1fr 3fr' }} gap={3} mb={4}>
+                    <Card sx={{ textAlign: 'center', justifyContent: 'center', alignItems: 'center', display: 'flex', minWidth: 400, maxWidth: 220 }}>
+                        <CardContent>
+                            <Typography variant="h6"> Aptos para receber creditos</Typography>
                             <Typography variant="h2" color={globalStatus.percent >= 60 ? 'success.main' : 'error.main'}>
                                 {globalStatus.percent}%
                             </Typography>
@@ -160,35 +160,43 @@ export default function Dashboard() {
 
                     <Paper sx={{ p: 3 }}>
                         <Typography variant="h6" display="flex" alignItems="center" gap={1} mb={2}>
-                            <LocationCity /> Distribuição e Dívidas
+                            <LocationCity /> Distribuição e dívidas
                         </Typography>
 
-                        <Box display="grid" gridTemplateColumns={{ xs: '1fr', md: '1fr 1fr' }} gap={2}>
-                            {/* Gráfico de Pizza */}
+                        <Box display="grid" gridTemplateColumns={{ xs: '1fr', md: '1fr 2fr' }} gap={2}>
                             <Box sx={{ textAlign: 'center', justifyContent: 'center', alignItems: 'center', display: 'flex' }}>
-                                <CardContent >
+                                <CardContent>
                                     <Typography variant="h6">Total de dividas</Typography>
-                                    <Typography variant="h2" color={totalDividas > 0 ? 'error.main' : 'success.main'}>
+                                    <Typography variant="h3" color={totalDividas > 0 ? 'error.main' : 'success.main'}>
                                         {totalDividas.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                                     </Typography>
                                 </CardContent>
                             </Box>
 
-                            {/* Gráfico de Barras de Dívidas */}
                             <ResponsiveContainer width="100%" height={250}>
                                 <BarChart
                                     data={summary
                                         .filter(s => s.totalDividaMF > 0)
                                         .sort((a, b) => b.totalDividaMF - a.totalDividaMF)
-                                        .slice(0, 10) // Top 10
+                                        .slice(0)
                                         .map(s => ({
                                             name: s.name.length > 12 ? s.name.slice(0, 12) + '...' : s.name,
                                             divida: s.totalDividaMF
                                         }))}
-                                    margin={{ top: 30, right: 20, left: 0, bottom: 20 }} // aumenta o topo
+                                    margin={{ top: 30, right: 20, left: 0, bottom: 20 }}
                                 >
-                                    <XAxis dataKey="name" tick={{ fontSize: 10 }} />
-                                    <YAxis tickFormatter={v => v >= 1000 ? (v / 1000) + 'k' : v} />
+                                    <XAxis
+                                        dataKey="name"
+                                        tick={{
+                                            fontSize: 12
+                                        }}
+                                    />
+                                    <YAxis
+                                        tickFormatter={v => v >= 1000 ? (v / 1000) + 'k' : v}
+                                        tick={{
+                                            fontSize: 12
+                                        }}
+                                    />
                                     <Tooltip formatter={(v) => (v as number).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })} />
                                     <Bar
                                         dataKey="divida"
@@ -197,7 +205,8 @@ export default function Dashboard() {
                                         label={{
                                             position: "top",
                                             formatter: (value: number) =>
-                                                value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+                                                value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
+                                            fontSize: 16
                                         }}
                                     />
                                 </BarChart>

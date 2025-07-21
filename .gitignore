@@ -2,3 +2,4 @@ docker-compose.yml
 folder-alias.json
 private-folder-alias.json
 MuniPayBack/src/main/resources/application-dev.properties
+muni_pay/Dockerfile

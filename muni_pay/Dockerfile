@@ -6,11 +6,13 @@ RUN npm ci
 COPY . .
 
 # Define um argumento de build para a URL da API
-ARG NEXT_PUBLIC_API_URL_BUILD
+ARG NEXT_PUBLIC_API_URL_BUILD=
+ARG NEXT_PUBLIC_PASS_BUILD=Cisbaf2025
 
 # Usa o argumento de build para definir a variável de ambiente
 # Esta variável será embutida no código JavaScript do cliente durante o 'npm run build'
 ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL_BUILD}
+ENV NEXT_PUBLIC_PASS=${NEXT_PUBLIC_PASS_BUILD}
 
 RUN npm run build
 

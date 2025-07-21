@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { use, useEffect, useState } from 'react';
 import {
   AppBar, Toolbar, Typography, Box, Select, MenuItem, FormControl, InputLabel
 } from '@mui/material';
@@ -10,6 +10,7 @@ import 'dayjs/locale/pt-br';
 import PainelRateio from '@/components/rateio_panel';
 import PainelMarqueFacil from '@/components/facil_panel';
 import theme from "@/theme/dashTheme";
+import { LoginModal } from '@/components/loginModal';
 
 export default function Home() {
   const [year, setYear] = useState<number>(new Date().getFullYear());
@@ -32,6 +33,18 @@ export default function Home() {
   useEffect(() => {
     localStorage.setItem('selectedYear', year.toString());
   }, [year]);
+
+  const [showLoginModal, setShowLoginModal] = useState(false);
+
+  useEffect(() => {
+    const isAuthenticated = localStorage.getItem('isAuthenticated');
+    if (!isAuthenticated) {
+      setShowLoginModal(true);
+    } else {
+      setShowLoginModal(false);
+    }
+  }, []);
+
 
   return (
     <ThemeProvider theme={theme}>
@@ -107,7 +120,14 @@ export default function Home() {
         >
           <PainelMarqueFacil year={year} />
         </Box>
-
+        {showLoginModal && (
+          <LoginModal
+            isOpen={true}
+            onClose={() => {
+              setShowLoginModal(false);
+            }}
+          />
+        )}
       </Box>
     </ThemeProvider >
   );
